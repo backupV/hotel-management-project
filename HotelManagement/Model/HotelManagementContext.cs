@@ -35,7 +35,7 @@ public partial class HotelManagementContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        string connectionString = DotNetEnv.Env.GetString("CONNECTION_STRING");
+        string connectionString = "Data Source=V\\SQLEXPRESS;Initial Catalog=hotel_management;Integrated Security=True;User ID=V\\vidwa;TrustServerCertificate=True";
         optionsBuilder.UseSqlServer(connectionString);
     }
 

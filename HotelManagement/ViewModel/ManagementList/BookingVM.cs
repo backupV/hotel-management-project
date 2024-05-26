@@ -358,7 +358,7 @@ public partial class BookingList : ObservableObject
                 CustomerId = CurrentBooking.CustomerID!,
                 StaffId = CurrentBooking.StaffID!,
                 InvoiceDate = DateTime.Now,
-                TotalAmount = 0,
+                TotalAmount = CalculateTotalAmount(),
                 PaymentType = CurrentBooking.PaymentMethod == "Cash" ? "Cash" : "Credit card"
             };
 
@@ -372,7 +372,7 @@ public partial class BookingList : ObservableObject
                 GuestQuantity = int.Parse(CurrentBooking.GuestQuantity!),
                 CheckInDate = CurrentBooking.CheckInDate,
                 CheckOutDate = CurrentBooking.CheckOutDate,
-                TotalAmount = CurrentBooking.TotalAmount
+                TotalAmount = CalculateTotalAmount()
             };
 
             await context.Bookings.AddAsync(bookingEntity);
@@ -597,6 +597,7 @@ public partial class BookingList : ObservableObject
         }
 
         // CheckInDate
+        // CheckInDate
         private DateTime? _checkInDate;
 
         [CustomValidation(typeof(BookingVM), nameof(ValidateCheckInDate))]
@@ -607,7 +608,7 @@ public partial class BookingList : ObservableObject
             {
                 SetProperty(ref _checkInDate, value, true);
                 ValidateProperty(CheckOutDate, nameof(CheckOutDate));
-                ChangeDepositFee(value);
+                ChangeDepositFee(value, CheckOutDate);
             }
         }
 
@@ -622,6 +623,7 @@ public partial class BookingList : ObservableObject
             {
                 SetProperty(ref _checkOutDate, value, true);
                 ValidateProperty(CheckInDate, nameof(CheckInDate));
+                ChangeDepositFee(CheckInDate, value);
             }
         }
 
@@ -707,21 +709,23 @@ public partial class BookingList : ObservableObject
             base.ValidateAllProperties();
         }
 
-        private void ChangeDepositFee(DateTime? checkIn)
+        private void ChangeDepositFee(DateTime? checkIn, DateTime? checkOut)
         {
             using var context = new HotelManagementContext();
             var booking = context.Bookings.Find(BookingID);
-            var invoice = context.Invoices.Find(InvoiceID);
 
             if (checkIn < DateTime.Now)
+            {
                 DepositFee = 0;
-            else if (booking == null)
-                DepositFee = (checkIn - DateTime.Now).Value.Days / 15 * 20;
-            else
-                DepositFee = (checkIn - invoice.InvoiceDate).Value.Days / 15 * 20;
+            }
+            else if (checkOut.HasValue && checkIn.HasValue)
+                    DepositFee = (checkOut.Value - checkIn.Value).Days / 15 * 20;
+                else
+                    DepositFee = 20;
+            }
         }
     }
-}
+
 
 public class RoomInfo
 {

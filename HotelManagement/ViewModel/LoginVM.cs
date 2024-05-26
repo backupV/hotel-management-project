@@ -46,7 +46,7 @@ public partial class LoginVM : ObservableObject
         }
         catch (Exception)
         {
-            ErrorMessage = "Login failed";
+                       ErrorMessage = "Login failed";
         }
         finally
         {

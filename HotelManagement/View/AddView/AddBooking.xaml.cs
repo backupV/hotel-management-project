@@ -21,6 +21,12 @@ namespace HotelManagement.View.AddView
     /// </summary>
     public partial class AddBooking : Window
     {
+        private void PaymentBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Log the selected payment method
+            string selectedPaymentMethod = PaymentBox.SelectedItem as string;
+            System.Diagnostics.Debug.WriteLine($"Selected Payment Method: {selectedPaymentMethod}");
+        }
         private BookingList? Booking => DataContext as BookingList;
 
         public AddBooking(object dataContext)
